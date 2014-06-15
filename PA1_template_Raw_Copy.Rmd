@@ -9,30 +9,36 @@ Coursera reproducible research course in the Data Science specilization.
 
 ```{r, echo=TRUE}
 activity <- read.csv("./activity.csv", header=TRUE)
+head(activity)
+tail(activity)
+str(activity)
 ```
 
 ## What is mean total number of steps taken per day?
 
 ```{r, echo=TRUE}
+library(ggplot2)
 require(data.table)
 activity_dt <- data.table(activity)
 
 steps_by_day <- activity_dt[,data.frame(DailySteps= sum(steps,na.rm= TRUE)), by=date]
+head(steps_by_day)
 
-```
+#plot(x= steps_by_day$date, y= steps_by_day$DailySteps, type="h")
 
-Plot histogram of Daily Steps
-
-```{r fig.width=7, fig.height=6, echo=TRUE}
 plot(steps_by_day$DailySteps, type="h")
-```
 
 
-```{r, echo=TRUE}
 #calculate Mean
+#mean_steps_by_day <- activity_dt[,data.frame(MeanDailySteps = mean(steps,na.rm= TRUE)), by=date]
+#mean_steps_by_day
+
 mean(steps_by_day$DailySteps)
 
+
 #calculate Median
+#median_steps_by_day <- activity_dt[,data.frame(MedianDailySteps = as.double(median(steps,na.rm= TRUE))), by=date]
+#median_steps_by_day
 median(steps_by_day$DailySteps)
 
 ```
@@ -40,21 +46,35 @@ median(steps_by_day$DailySteps)
 ## What is the average daily activity pattern?
 
 ```{r, echo=TRUE}
-#calculate Mean of interval
+#calculate Mean steps for 5 minute interval
+#mean_steps_by_day_5int <- activity_dt[activity_dt$interval==5,data.frame(MeanDailySteps5int = mean(steps,na.rm= TRUE)), by=date]
+
 mean_steps_by_day_5int <- activity_dt[,data.frame(MeanDailySteps5int = mean(steps,na.rm= TRUE)), by="date,interval"]
 
 head(mean_steps_by_day_5int)
 
+#plot(x = mean_steps_by_day_5int$date, y= mean_steps_by_day_5int$MeanDailySteps5int, type= "l" )
+
+#plot(mean_steps_by_day_5int$MeanDailySteps5int, type= "l" )
+
 ```
-Plot of the Interval
 
 ```{r fig.width=7, fig.height=6, echo=TRUE}
-library(lattice)
+library(ggplot2)
+#set.panel(2,1)
+#qplot(x= mean_steps_by_day_5int_weekdays$interval, y=mean_steps_by_day_5int_weekdays$MeanDailySteps5intWday, group = mean_steps_by_day_5int_weekdays$typeOfDay, type = "l")
+
+#xyplot(MeanDailySteps5intWday ~ interval | typeOfDay ,mean_steps_by_day_5int_weekdays, type="l", layout(1,2))
+
 xyplot(MeanDailySteps5int ~ interval , mean_steps_by_day_5int, type="l")
+
+#plot(mean_steps_by_day_5int$MeanDailySteps5int, type= "l" )
 
 ```
 
-The 5-minute interval with the maximum number of steps in 5-minute interval 60
+
+
+The 5-minute interval with the maximum number of steps in 5-minute interval 10
 
 ## Imputing missing values
 
@@ -63,16 +83,19 @@ The 5-minute interval with the maximum number of steps in 5-minute interval 60
 noNaVals <- complete.cases(activity)
 activity_na <- activity[!noNaVals,]
 
-#Total number of rows with NA values
+#number of rows with NA values
 nrow(activity_na)
 
-#Imputing missing values
+#replace Na Values
+
 activity_noNa <- activity
 
 avgSteps <- mean(activity_noNa$steps, na.rm=TRUE)
 
 random.impute <- function(a,b){
         naVal <- is.na(a)
+        #n.naVal <- sum(naVal)
+        #a.obs <- a[!naVal]
         imputed <- a
         imputeWith <- b
         imputed[naVal] <- imputeWith
@@ -81,7 +104,6 @@ random.impute <- function(a,b){
 
 activity_noNa2 <- random.impute(activity_noNa, avgSteps)
 
-#imputed data set
 head(activity_noNa2)
 
 
@@ -90,27 +112,25 @@ activity_noNa2 <- data.table(activity_noNa2)
 
 steps_by_day_noNa <- activity_noNa2[,data.frame(DailySteps= sum(steps,na.rm= TRUE)), by=date]
 head(steps_by_day_noNa)
-```
 
-Histogram with imputed data
-
-```{r fig.width=7, fig.height=6, echo=TRUE}
 plot(steps_by_day_noNa$DailySteps, type="h")
-```
 
-Mean and Median with imputed data
-
-```{r}
 #calculate Mean
+#mean_steps_by_day_noNa <- activity_noNa2[,data.frame(MeanDailySteps = mean(steps,na.rm= TRUE)), by=date]
+#head(mean_steps_by_day_noNa)
 mean(steps_by_day_noNa$DailySteps)
 
 #calculate Median
+#median_steps_by_day_noNa <- activity_noNa2[,data.frame(MedianDailySteps = as.double(median(steps,na.rm= TRUE))), by=date]
+#head(median_steps_by_day_noNa)
 median(steps_by_day_noNa$DailySteps)
+
 
 ```
 There is a difference between the mean and median that was previously calculated when compared to the mean and median that was calculate with the imputed data.
 
 The impact of imputing data on the estimates for total daily numbers is the date 2012-10-01 no longer has Zero daily steps.
+
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
@@ -122,19 +142,26 @@ head(activity_noNa2)
 
 activity_noNa2[,"typeOfDay"] <- ifelse(activity_noNa2$dayOfWeek %in% c("Saturday","Sunday"), "Weekend", "Weekday")
 
+#require(data.table)
+
+
 mean_steps_by_day_5int_weekdays <- activity_noNa2[,data.frame(MeanDailySteps5intWday = mean(steps,na.rm= TRUE)), by="interval,typeOfDay"]
 
 head(mean_steps_by_day_5int_weekdays)
+
 
 meanData_5int <- activity_noNa2[,mean(steps), by="interval,typeOfDay"]
 
 head(meanData_5int)
 
 ```
-Panel plot time series
+Panel plot
 
 ```{r fig.width=7, fig.height=6, echo=TRUE}
-library(lattice)
+library(ggplot2)
+#set.panel(2,1)
+#qplot(x= mean_steps_by_day_5int_weekdays$interval, y=mean_steps_by_day_5int_weekdays$MeanDailySteps5intWday, group = mean_steps_by_day_5int_weekdays$typeOfDay, type = "l")
+
 xyplot(MeanDailySteps5intWday ~ interval | typeOfDay ,mean_steps_by_day_5int_weekdays, type="l", layout(1,2))
 
 ```

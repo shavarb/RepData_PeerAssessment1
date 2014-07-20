@@ -36,10 +36,14 @@ Plot histogram of Daily Steps
 
 
 ```r
-plot(steps_by_day$DailySteps, type = "h")
+hist(steps_by_day$DailySteps)
 ```
 
 ![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
+
+```r
+# plot(steps_by_day$DailySteps, type='h')
+```
 
 
 
@@ -99,6 +103,8 @@ xyplot(MeanDailySteps5int ~ interval, mean_steps_by_day_5int, type = "l")
 The 5-minute interval with the maximum number of steps in 5-minute interval 60
 
 ## Imputing missing values
+
+Missing data will be imputted by finding the average steps and using that avarage to replace the missing Data
 
 
 ```r
@@ -171,10 +177,14 @@ Histogram with imputed data
 
 
 ```r
-plot(steps_by_day_noNa$DailySteps, type = "h")
+hist(steps_by_day_noNa$DailySteps)
 ```
 
 ![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8.png) 
+
+```r
+# plot(steps_by_day_noNa$DailySteps, type='h')
+```
 
 
 Mean and Median with imputed data

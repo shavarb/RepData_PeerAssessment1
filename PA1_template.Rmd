@@ -24,7 +24,8 @@ steps_by_day <- activity_dt[,data.frame(DailySteps= sum(steps,na.rm= TRUE)), by=
 Plot histogram of Daily Steps
 
 ```{r fig.width=7, fig.height=6, echo=TRUE}
-plot(steps_by_day$DailySteps, type="h")
+hist(steps_by_day$DailySteps)
+#plot(steps_by_day$DailySteps, type="h")
 ```
 
 
@@ -57,6 +58,8 @@ xyplot(MeanDailySteps5int ~ interval , mean_steps_by_day_5int, type="l")
 The 5-minute interval with the maximum number of steps in 5-minute interval 60
 
 ## Imputing missing values
+
+Missing data will be imputted by finding the average steps and using that avarage to replace the missing Data
 
 ```{r, echo=TRUE}
 
@@ -95,7 +98,8 @@ head(steps_by_day_noNa)
 Histogram with imputed data
 
 ```{r fig.width=7, fig.height=6, echo=TRUE}
-plot(steps_by_day_noNa$DailySteps, type="h")
+hist(steps_by_day_noNa$DailySteps)
+#plot(steps_by_day_noNa$DailySteps, type="h")
 ```
 
 Mean and Median with imputed data
